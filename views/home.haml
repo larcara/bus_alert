@@ -1,0 +1,119 @@
+%html{:lang => "en"}
+  %head
+    %title Title Page
+    %meta{:charset => "UTF-8"}
+      %meta{:content => "", :name => "description"}
+        %meta{:content => "width=device-width, initial-scale=1", :name => "viewport"}
+          %meta{:content => "width=device-width, initial-scale=1.0", :name => "viewport"}
+            / Bootstrap CSS
+
+            %link{:href => "application.css", :rel => "stylesheet", :type => "text/css"}/
+            %link{:href => "css/timeline2.css", :rel => "stylesheet", :type => "text/css"}/
+            %link{:href => "http://fonts.googleapis.com/css?family=Dosis", :rel => "stylesheet", :type => "text/css"}
+            //%script{:src => "js/vendor/less.js", :type => "text/javascript"}
+  %body
+    .container-fluid
+      #step1.row
+        .col-xs-12.col-sm-12.col-md-6.col-lg-6
+          .panel.panel-default
+            .panel-heading
+              %h3.panel-title Reserve My Stop!
+            .panel-body
+              %form#form1{:action => "start_trace", :method => "post", :role => "form"}
+                %input#address_from_lat{:name => "lat", :type => "hidden", :value => "#{params[:lat]}"}
+                %input#address_from_lmg{:name => "lng", :type => "hidden", :value => "#{params[:lng]}"}
+                .row
+                  .form-group.col-xs-6.col-sm-6.col-lg-6.col-md-6
+                    %label Select a bus line
+                    %select#bus_number.form-control{:name => "bus_number"}
+                      -@linee.each do |s|
+                        %option{value: s[0]}=s[1]
+                  //.form-group.col-xs-6.col-sm-6.col-lg-6.col-md-6
+                  //  %label ...or type ones
+                  //  %input#bus_number2.form-control{:name => "bus_number2", :placeholder => "other", :title => "Other bus"}
+                .row
+                  .form-group.col-xs-11.col-sm-11.col-lg-6.col-md-6
+                    %label your destination address is...
+                    %input#address_to.form-control{:name => "address_to", :placeholder => "destination address", :title => "Destination Address", :type => "text", :value => ""}
+                    %input#address_to_geo.form-control{:name => "address_to_geo", :type => "text", :value => ""}
+                %button.btn.btn-primary{:type => "submit"} Show my stop! 
+        
+      / jQuery
+      %script{:src => "js/vendor/jquery-1.11.1.min.js"}
+      //%script{:src => "js/vendor/jquery.xmlrpc.js"}
+      / Bootstrap JavaScript
+      %script{:src => "js/vendor/bootstrap.js"}
+      //%script{:src => "https://xxxxmaps.xxxgoogleapis.com/maps/api/js?key=AIzaSyBsZ-aje5ZmeJtR23Y5bdz5cB-n3SQ7ue0&sensor=false&libraries=places", :type => "text/javascript"}
+      %script{:src => "https://maps.googleapis.com/maps/api/js?libraries=places", :type => "text/javascript"}
+      /
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places">    </script>
+      %script{:src => "js/app/app.js"}
+:javascript
+   
+   var directionsService;
+   //var autocomplete_from ;
+   var autocomplete_to ;
+   var browserSuportFlag;
+   var geocoder ;
+
+
+  function geolocate() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var geolocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+        //autocomplete_from.setBounds(new google.maps.LatLngBounds(geolocation,geolocation));
+        autocomplete_to.setBounds(new google.maps.LatLngBounds(geolocation,geolocation));
+            
+        
+        //geocoder.geocode({'latLng': geolocation}, function(results, status) {
+        //     if(status == google.maps.GeocoderStatus.OK) {
+        //       tmp=results[0]["address_components"];
+        //        loc=results[0]["geometry"]["location"];
+        //       console.log(results);
+        //       $("#address_from").val(tmp[1]['long_name'] + ", " + tmp[2]['long_name']);
+        //       $("#address_from_geo").val(loc["k"] + ", " +loc["B"]);
+        //   };
+        //});
+      });
+    }
+    else {
+      browserSupportFlag = false;
+      console.log("Browser doesn't support Geolocation");
+      //$("#address_from").val("Browser doesn't support Geolocation. Type start Address");
+    }
+
+  };
+  
+
+
+  function fillInAddress(autocomplete_field, destination_field) {
+  // Get the place details from the autocomplete object.
+  var place = autocomplete_field.getPlace();
+  console.log(place);
+  tmp=place.address_components;
+  loc=place.geometry.location;
+  console.log(tmp);
+  $("#"+destination_field+"_geo").val(loc["k"] + ", " +loc["B"]);
+  $("#"+destination_field).val(tmp[0]['long_name'] + ", " + tmp[1]['long_name']);
+  
+  // Get each component of the address from the place details
+ 
+   };   
+
+  $(document).ready(function(){
+      directionsService = new google.maps.DirectionsService();
+      autocomplete_to = new google.maps.places.Autocomplete((document.getElementById('address_to')),{ types: ['geocode'] });
+      //autocomplete_from = new google.maps.places.Autocomplete((document.getElementById('address_from')),{ types: ['geocode'] });
+      google.maps.event.addListener(autocomplete_to, 'place_changed', function() {fillInAddress(autocomplete_to, "address_to");});
+      //google.maps.event.addListener(autocomplete_from, 'place_changed', function() {fillInAddress(autocomplete_from, "address_from");});
+      browserSuportFlag= new Boolean();
+      geocoder = new google.maps.Geocoder();
+      geolocate();
+      //$("#address_to").val("Via Polibio, Roma");
+
+      //$("#form1").submit(function(event){
+      //event.preventDefault();
+      //calculate_route();
+      //})
+  });
