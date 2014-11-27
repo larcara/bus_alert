@@ -166,14 +166,14 @@ class Alert
     end
     return final_result
   end
-  def self.tweet_bus
+  def self.tweet_bus(times=10)
     client = Twitter::REST::Client.new do |config|
       config.consumer_key        = ENV["CONSUMER_KEY"]
       config.consumer_secret     = ENV["CONSUMER_SECRET"]
       config.access_token        = ENV["YOUR_ACCESS_TOKEN"]
       config.access_token_secret = ENV["YOUR_ACCESS_SECRET"]
     end
-    check_alert(100) {|user, message| client.update("#{user} #{message}")}
+    check_alert(times) {|user, message| client.update("#{user} #{message}")}
   end
   private
   # This method search for an alert based on track_number or [bus_line, bus_stop]
