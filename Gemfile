@@ -9,4 +9,6 @@ gem 'mongoid'
 gem 'bson_ext'
 gem 'omniauth-twitter'
 gem 'twitter'
+gem 'newrelic_rpm'
+
 

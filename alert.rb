@@ -158,6 +158,7 @@ class Alert
         end
         rescue Exception => e
           puts "Error:"
+          puts e.backtrace
           puts e.message
 
         end
