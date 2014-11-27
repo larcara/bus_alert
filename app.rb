@@ -44,7 +44,7 @@ end
 
 get '/alerts' do
 	current_user!
-  @data = Alert.get_alerts(session[:username])
+
   # a=AtacProxy.new()
   # @percorsi=a.get_percorsi("913")
   # @percorsi.each do |percorso|
@@ -63,16 +63,28 @@ get '/alerts' do
   haml :home
 end
 
-get '/add_alert' do
-   current_user!
-   @percorsi=[]
-   haml :add_alert
+get 'remove_alert' do
+  current_user!
+  Alert.remove(@current_user, params[:percorso])
+
 end
 
 post '/add_alert' do
    current_user!
-   Alert.add_alert(line: params[:bus_line], stop: params[:bus_stop], user: @current_user)
-   redirect to("/alerts")
+   percorso=params[:percorso]
+   if percorso.nil? || percorso==""
+    atac=AtacProxy.new
+    @percorsi={}
+    atac.get_percorsi(params[:bus_line]).each do |linea|
+      @percorsi[linea[0]]= {capolinea: linea[1], stops: atac.get_stops(linea[0])}
+    end
+    @data=[]
+    haml :home
+   else
+     percorso=percorso.split("|")
+     Alert.add_alert(bus_line: params[:bus_line], bus_stop: percorso[1], user: @current_user)
+     redirect to("/alerts")
+   end
 end
 
 get '/auth/twitter/callback' do
@@ -80,7 +92,6 @@ get '/auth/twitter/callback' do
     puts auth.inspect
     puts auth.info.inspect
     session[:username]="@#{auth.info.nickname}"
-    puts session[:username]
     redirect to("/alerts") unless session[:username].nil?
     return
   end
@@ -92,7 +103,13 @@ get '/auth/failure' do
 end
 
 def current_user!
- redirect to("/login") if session[:username].nil?
+  if session[:username].nil?
+    redirect to("/login")
+  else
+    @current_user=session[:username]
+    @data = Alert.get_alerts(session[:username])
+
+  end
 
 end
 

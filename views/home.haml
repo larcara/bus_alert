@@ -13,31 +13,37 @@
             //%script{:src => "js/vendor/less.js", :type => "text/javascript"}
   %body
     .container-fluid
-      #step1.row
+      .row
         .col-xs-12.col-sm-12.col-md-6.col-lg-6
           .panel.panel-default
             .panel-heading
               %h3.panel-title Reserve My Stop!
             .panel-body
-              %form#form1{:action => "start_trace", :method => "post", :role => "form"}
+              %form{action: :add_alert, method: :post}
                 %input#address_from_lat{:name => "lat", :type => "hidden", :value => "#{params[:lat]}"}
                 %input#address_from_lmg{:name => "lng", :type => "hidden", :value => "#{params[:lng]}"}
+                %p line
+                %input{name: :bus_line, value: params[:bus_line]}
+                - if @percorsi
+                  %select{name: :percorso}
+                    -@percorsi.each do |k,v|
+                      %optgroup{label: v[:capolinea]}
+                        -v[:stops]["fermate"].each do |stop|
+                          %option{value: "#{k}|#{stop["id_palina"]}"}=stop["nome"]
+                %input{type: :submit}
+      .row
+        .col-xs-12.col-sm-12.col-md-6.col-lg-6
+          .panel.panel-default
+            .panel-heading
+              %h3.panel-title My reservation
+            .panel-body
+              -@data.each do |data|
                 .row
                   .form-group.col-xs-6.col-sm-6.col-lg-6.col-md-6
-                    %label Select a bus line
-                    %select#bus_number.form-control{:name => "bus_number"}
-                      -@linee.each do |s|
-                        %option{value: s[0]}=s[1]
-                  //.form-group.col-xs-6.col-sm-6.col-lg-6.col-md-6
-                  //  %label ...or type ones
-                  //  %input#bus_number2.form-control{:name => "bus_number2", :placeholder => "other", :title => "Other bus"}
-                .row
-                  .form-group.col-xs-11.col-sm-11.col-lg-6.col-md-6
-                    %label your destination address is...
-                    %input#address_to.form-control{:name => "address_to", :placeholder => "destination address", :title => "Destination Address", :type => "text", :value => ""}
-                    %input#address_to_geo.form-control{:name => "address_to_geo", :type => "text", :value => ""}
-                %button.btn.btn-primary{:type => "submit"} Show my stop! 
-        
+                    %label=data[0]
+                    %label=data[1]
+                    %label=data[2]
+
       / jQuery
       %script{:src => "js/vendor/jquery-1.11.1.min.js"}
       //%script{:src => "js/vendor/jquery.xmlrpc.js"}

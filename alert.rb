@@ -82,10 +82,12 @@ class Alert
   class BusAlert
     include Mongoid::Document
     #field :stop_number
-    #field :line
+    field :bus_line
     field :percorso
-    field :stops, type: Array #{"nome_ricapitalizzato"=>"Augusto Imperatore", "nome"=>"AUGUSTO IMPERATORE", "stato_traffico"=>0, "id_palina"=>"70359", "soppressa"=>false}
+    field :stops, type: Array
+    field :stops_data, type: Hash #{"nome_ricapitalizzato"=>"Augusto Imperatore", "nome"=>"AUGUSTO IMPERATORE", "stato_traffico"=>0, "id_palina"=>"70359", "soppressa"=>false}
     field :last_update, type: Date, default: Proc.new{Date.today}
+    field :users, type: Array, default: []
     field :alert_data, type: Array, default: []
 
     def add_alert_data(user, stops)
@@ -93,12 +95,14 @@ class Alert
       puts "current_user_alert : #{current_user_alert.inspect}"
       current_user_alert[1] +=  stops
       puts "new current_user_alert : #{current_user_alert.inspect}"
-      self.add_to_set(:alert_data, [current_user_alert])
+      self.add_to_set(alert_data: [current_user_alert])
+      self.add_to_set(users: user)
       current_user_alert
     end
   end
 
   def self.add_alert(options={}) #line: params[:bus_line], stop: params[:bus_stop], user: @current_user
+    puts "Start adding alert for #{options.inspect}"
    return options.map{|x| add_alert(x)} if options.is_a? Array 
 
    alert=Alert.get_alert(options)
@@ -185,7 +189,10 @@ class Alert
     return nil
   end
   def self.get_alerts(username)
-    data=BusAlert.in("alert_data.0"=> [username]).to_a
-    data.map{|alert| x["alert_data"].map{|data| data if data[0]==username}}
-      end
+    data=BusAlert.in("users"=> [username]).to_a
+    result={}
+
+    data.each{|alert| result[alert["bus_line"]]=alert["alert_data"].map{|data| data[1] if data[0]==username}}
+    return result
+  end
 end

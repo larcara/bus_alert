@@ -3,11 +3,11 @@ development:
   sessions:
     default:
       hosts:
-        #- localhost:27018
-        - kahana.mongohq.com:10050
+        - localhost:27018
+        #- kahana.mongohq.com:10050
       database: pres_stop
-      username: pres_stop
-      password: averysimplepassword
+      #username: pres_stop
+      #password: averysimplepassword
   options:
     #allow_dynamic_fields: false
     #identity_map_enabled: true
