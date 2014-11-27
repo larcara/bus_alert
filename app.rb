@@ -45,21 +45,8 @@ end
 get '/alerts' do
 	current_user!
   @data = Alert.get_alerts(session[:username])
-  # a=AtacProxy.new()
-  # @percorsi=a.get_percorsi("913")
-  # @percorsi.each do |percorso|
-  #    puts percorso[0]
-  #    @fermate=a.get_stops(percorso[0])
-  #    puts @fermate["percorso"].inspect
-  #    puts @fermate["percorsi"].inspect
-  #    puts @fermate["orari_partenza_vicini"].inspect
-  #    puts "--------------"
-  #    @fermate["fermate"].each do |fermata|
-  #     puts fermata.inspect
-  #     puts "........"
-  #    end
-  #  end
-  # return ""
+  haml :index
+
 end
 
 get '/add_alert' do
