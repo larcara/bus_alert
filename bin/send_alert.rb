@@ -1,2 +1,2 @@
 #!/usr/bin/env ruby
-require "alert.rb"
+require "../alert.rb"
