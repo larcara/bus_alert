@@ -2,12 +2,13 @@
 development:
   sessions:
     default:
-      hosts:
-        - localhost:27018
-        #- kahana.mongohq.com:10050
-      database: pres_stop
+      #hosts:
+      #  - localhost:27018
+      #  - kahana.mongohq.com:10050
+      #database: pres_stop
       #username: pres_stop
       #password: averysimplepassword
+      uri: <%=ENV['MONGOURI_BUSALERT']%>
   options:
     #allow_dynamic_fields: false
     #identity_map_enabled: true
