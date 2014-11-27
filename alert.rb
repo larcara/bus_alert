@@ -122,13 +122,16 @@ class Alert
   	atac=AtacProxy.new()
     response=[]
     final_result={}
+
     cicle_count.times do |i|
       final_result={}
       puts "..#{i}.."
+
       BusAlert.exists(alert_data: 1).each do |percorso|
         track_number=percorso["percorso"]
         final_result[track_number]={}
         puts "check line #{track_number}"
+        begin
         response=atac.get_stops(track_number.to_i)
         next_bus=response["orari_partenza_vicini"]
         busses=[]
@@ -152,6 +155,11 @@ class Alert
               final_result[track_number][user]= result
             end
           end
+        end
+        rescue Exception => e
+          puts "Error:"
+          puts e.message
+
         end
       end
       sleep 10
